@@ -1,20 +1,38 @@
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="utf-8">
     <title>演習課題5-2：外部APIの呼び出しテスト</title>
 </head>
 <body>
-    <h1 id="msg">何かのAPI</h1>
+    <h1 id="msg">JSONPlaceholder API</h1>
     <form name="apiform"><p>
-        何かのフォーム：<input type="text" name="form_data">
+        何かのフォーム：<input type="number" name="form_data" min="1" max="100">
         <button type="button" id="btn1" onclick="some_api(this.form)">実行</button>
     </p></form>
     
     <div id="result"></div>
     <script>
         async function some_api(myForm) {
-            // ここにコードを書く
-            document.getElementById("result").innerHTML += myForm.form_data.value+"<br />";
+            const postId = myForm.form_data.value;
+            const endpoint = `https://jsonplaceholder.typicode.com/posts/${postId}`;
+            
+            try {
+                const response = await fetch(endpoint);
+                if (!response.ok) throw new Error("通信エラー");
+                const data = await response.json();
+
+                const html = `
+                    <p><strong>投稿ID:</strong> ${data.id}</p>
+                    <p><strong>タイトル:</strong> ${data.title}</p>
+                    <p><strong>本文:</strong> ${data.body}</p>
+                    <hr>
+                `;
+                document.getElementById("result").innerHTML += html;
+            } catch (error) {
+                document.getElementById("result").innerHTML += "エラーが発生しました。<br />";
+            }
+
             document.apiform.reset();
         }
     </script>
